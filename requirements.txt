@@ -1,0 +1,6 @@
+streamlit
+pandas
+openpyxl
+google-cloud-bigquery
+google-auth
+
