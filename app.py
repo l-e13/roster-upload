@@ -7,6 +7,33 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 import io
 
+# Apparatus-to-type mapping
+apparatus_class = {
+    "Engine": "FIRE",
+    "Truck": "FIRE",
+    "Tower": "FIRE",
+    "Rescue Squad": "FIRE",
+    "Hazmat": "FIRE",
+    "Fire Boat": "FIRE",
+    "Command Unit": "FIRE",
+    "Foam Unit": "FIRE",
+    "Air Unit": "FIRE",
+    "Rehab Unit": "FIRE",
+    "Medic": "EMS",
+    "Ambulance": "EMS",
+    "EMS": "EMS"
+}
+
+# WDO codes (to be updated with your final list)
+wdo_codes = {
+    # FIRE
+    "DOW", "+DETAIL", "DET AS PEC", "TA-ANNEDU", "WDO", "+OTC", "BN", "FFD", "DETAIL",
+    # EMS
+    "+EMS (FF)", "+EMS (PM)", "+CITYWIDE", "EMS/DOTW", "EMS SUPER",
+    # OTHER
+    "OT-COD", "MANHOLD", "MANCALLCX"
+}
+
 # Page config
 st.set_page_config(page_title="Roster Ingestion", layout="centered")
 
@@ -78,10 +105,9 @@ def clean_roster_generic(df, filename):
     df2 = df2[[c for c in col_order if c in df2.columns]]
     return df2.rename(columns={c: f"column_{i+1}" for i, c in enumerate(df2.columns)})
 
-# Rename columns and convert types
-def rename_and_type(df):
-    import datetime as _dt
+# Rename and classify
 
+def rename_and_type(df):
     rename_map = {
         "column_1": "division",
         "column_2": "rank",
@@ -93,26 +119,10 @@ def rename_and_type(df):
         "column_8": "hours",
         "column_9": "roster_date"
     }
-
     df2 = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
 
-    if "rank" in df2.columns:
-        df2["rank"] = (
-            df2["rank"]
-            .astype(str)
-            .str.strip()
-            .str.replace(r'^\.+', '', regex=True)
-            .str.strip()
-        )
-
-    if "member_id" in df2.columns:
-        df2 = df2[df2["member_id"].notna() & df2["member_id"].astype(str).str.strip().ne("")]
-
-    if "hours" in df2.columns:
-        df2["hours"] = pd.to_numeric(df2["hours"], errors="coerce")
-
     def to_string_time(val):
-        if isinstance(val, _dt.time):
+        if isinstance(val, time):
             return val.strftime("%H:%M:%S")
         if isinstance(val, str):
             try:
@@ -125,58 +135,29 @@ def rename_and_type(df):
         if col in df2.columns:
             df2[col] = df2[col].apply(to_string_time)
 
-    if "roster_date" in df2.columns:
-        def to_date_string(d):
-            if isinstance(d, _dt.date):
-                return d.isoformat()
-            if isinstance(d, str):
-                try:
-                    return datetime.strptime(d, "%Y-%m-%d").date().isoformat()
-                except:
-                    return None
-            return None
-        df2["roster_date"] = df2["roster_date"].apply(to_date_string)
+    df2['wdo_flag'] = df2['code'].isin(wdo_codes)
 
-    for col in ["division", "rank", "member_id", "name", "code", "start", "through", "roster_date"]:
-        if col in df2.columns:
-            df2[col] = df2[col].astype(str).replace("None", None)
+    def get_ops_type(unit):
+        for key, val in apparatus_class.items():
+            if pd.notna(unit) and key in unit:
+                return val
+        return None
+
+    df2['ops_type'] = df2['division'].apply(get_ops_type)
+
+    def assign_wdo_category(row):
+        if not row.get('wdo_flag'):
+            return None
+        if row.get('code') == '+EMS':
+            if 'Medic' in row.get('division', ''):
+                return '+EMS (PM)' if '(PM)' in str(row.get('name')) else '+EMS (FF)'
+            elif 'Ambulance' in row.get('division', ''):
+                return '+EMS (FF)'
+        return f"{row.get('ops_type')} WDO"
+
+    df2['wdo_category'] = df2.apply(assign_wdo_category, axis=1)
 
     return df2.where(pd.notnull(df2), None)
-
-# Classification helpers
-def classify_assignment_type(row):
-    div = str(row.get("division", "")).lower()
-    rank = str(row.get("rank", "")).lower()
-    fire_keywords = [
-        "engine", "truck", "rescue squad", "fire boat", "foam unit",
-        "hazmat", "tower", "command unit", "staffing office", "dfc operations",
-        "safety officer", "fire investigations", "battalion chief special operations"
-    ]
-    ems_keywords = [
-        "medic", "ambulance", "ems liaison", "ems", "citywide",
-        "battalion chief of ems"
-    ]
-    if any(k in div for k in fire_keywords) or any(k in rank for k in fire_keywords):
-        return "FIRE"
-    elif any(k in div for k in ems_keywords) or any(k in rank for k in ems_keywords):
-        return "EMS"
-    else:
-        return "NON OPS"
-
-def classify_subcode(row):
-    code = str(row.get("code", "")).strip().upper()
-    rank = str(row.get("rank", "")).lower()
-    name = str(row.get("name", "")).lower()
-    if "paramedic" in rank or "(pm)" in name:
-        return "+EMS(PM)"
-    elif "emt" in rank:
-        return "+EMS(FF)"
-    elif code in ["REG", "WDO"]:
-        return f"+{code}"
-    elif code.startswith("+"):
-        return code
-    else:
-        return "+OTHER"
 
 # Upload to BigQuery
 def push_to_bigquery(df, table_id):
@@ -205,14 +186,12 @@ def push_to_bigquery(df, table_id):
 def log_upload_event(filename, row_count, status):
     client = get_bigquery_client()
     log_table_id = st.secrets["bigquery"]["log_table_id"]
-
     rows_to_insert = [{
         "filename": filename,
         "upload_time": datetime.utcnow().isoformat(),
         "row_count": row_count,
         "status": status
     }]
-
     errors = client.insert_rows_json(log_table_id, rows_to_insert)
     if errors:
         st.warning(f"\u26a0\ufe0f Failed to log upload for {filename}: {errors}")
@@ -235,11 +214,7 @@ if uploaded_files:
                 df_clean = clean_roster_generic(df_raw, filename)
                 df_final = rename_and_type(df_clean)
 
-                # Apply classification
-                df_final["assignment_type"] = df_final.apply(classify_assignment_type, axis=1)
-                df_final["subcode"] = df_final.apply(classify_subcode, axis=1)
-
-                st.write("\u2705 Cleaned & Classified Data Preview")
+                st.write("\u2705 Cleaned Data Preview")
                 st.dataframe(df_final.head())
 
                 if upload_to_bigquery:
@@ -260,5 +235,3 @@ if uploaded_files:
 
         st.write("## \ud83d\udcca Upload Summary")
         st.dataframe(pd.DataFrame(summary, columns=["filename", "status", "row_count"]))
-
-
