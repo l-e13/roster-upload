@@ -215,7 +215,8 @@ fire_divisions = {
     "Homeland Security / Rail Operations Control Center",
     "OUC Liaison / Fire Liaison Officer",
     "OUC Liaison / EMS Liaison Officer",
-    "Fire Prevention Division / Fire Investigations Unit"
+    "Fire Prevention Division / Fire Investigations Unit",
+    "Quarters E09 / Engine 09P/Station Security"
 }
 
 ems_divisions = {
@@ -275,7 +276,8 @@ ems_divisions = {
     "Ambulance 53",
     "Ambulance 54",
     "Ambulance 55",
-    "Ambulance 56"
+    "Ambulance 56",
+    "Quarters E14 / Ambulance 14"
 }
 
 apparatus_class = {
