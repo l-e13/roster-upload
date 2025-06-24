@@ -294,6 +294,24 @@ apparatus_class = {
     "EMS": "EMS"
 }
 
+def normalize_division_name(name):
+    return str(name).strip().upper() if name else ""
+
+def get_ops_type(division):
+    division_clean = normalize_division_name(division)
+    if division_clean in {normalize_division_name(d) for d in non_ops_divisions}:
+        return "NON-OPS"
+    elif division_clean in {normalize_division_name(d) for d in fire_divisions}:
+        return "FIRE"
+    elif division_clean in {normalize_division_name(d) for d in ems_divisions}:
+        return "EMS"
+    # Fallback based on keywords
+    for key, val in apparatus_class.items():
+        if key in division_clean:
+            return val
+    return "UNKNOWN"
+
+
 wdo_codes = {
     "DOW", "+DETAIL", "DET AS PEC", "TA-ANNEDU", "WDO", "+OTC", "BN", "FFD", "DETAIL",
     "+EMS (FF)", "+EMS (PM)", "+CITYWIDE", "EMS/DOTW", "EMS SUPER",
