@@ -532,22 +532,48 @@ if uploaded_files:
 elif page == "WDO Dashboard":
     st.header("WDO Dashboard Tester")
 
-    # Example BigQuery SQL
+    # Query BigQuery
     sql = """
     SELECT 
       roster_date,
       ops_type,
       COUNT(*) AS wdo_count
-    FROM `disco-ivy-463814-n0.rosters.roster_data`
+    FROM `your_project.rosters.roster_data`
     WHERE wdo_flag = TRUE
     GROUP BY roster_date, ops_type
     """
-
     client = get_bigquery_client()
     df = client.query(sql).to_dataframe()
 
-    # Fill in FIRE / EMS / TOTAL rows even if missing
+    # Pivot to wide format
     df_pivot = df.pivot(index="roster_date", columns="ops_type", values="wdo_count").fillna(0)
     df_pivot["TOTAL"] = df_pivot.get("FIRE", 0) + df_pivot.get("EMS", 0)
 
-    st.line_chart(df_pivot)
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    def plot_distribution(data, label, color='blue'):
+        fig, ax = plt.subplots()
+        counts = data.dropna()
+        mean = counts.mean()
+        std = counts.std()
+
+        ax.hist(counts, bins=20, color=color, edgecolor='black', alpha=0.7)
+        ax.axvline(mean, color='red', linestyle='dashed', linewidth=2, label=f"Mean = {mean:.2f}")
+        ax.axvline(mean + std, color='green', linestyle='dotted', linewidth=2, label=f"+1 SD = {mean+std:.2f}")
+        ax.axvline(mean - std, color='green', linestyle='dotted', linewidth=2, label=f"-1 SD = {mean-std:.2f}")
+        ax.set_title(f"{label} WDO per Day")
+        ax.set_xlabel("WDO Count")
+        ax.set_ylabel("Days")
+        ax.legend()
+        st.pyplot(fig)
+
+    st.subheader("Fire WDO Per Day")
+    plot_distribution(df_pivot["FIRE"], "Fire", color='orange')
+
+    st.subheader("EMS WDO Per Day")
+    plot_distribution(df_pivot["EMS"], "EMS", color='blue')
+
+    st.subheader("Total WDO Per Day")
+    plot_distribution(df_pivot["TOTAL"], "Total", color='purple')
+
