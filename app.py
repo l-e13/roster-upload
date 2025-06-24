@@ -314,7 +314,7 @@ def get_ops_type(division):
 
 wdo_codes = {
     "DOW", "+DETAIL", "DET AS PEC", "TA-ANNEDU", "WDO", "+OTC", "BN", "FFD", "DETAIL",
-    "+EMS (FF)", "+EMS (PM)", "+CITYWIDE", "EMS/DOTW", "EMS SUPER",
+    "+EMS (FF)", "+EMS (PM)", "+EMS", "+CITYWIDE", "EMS/DOTW", "EMS SUPER",
     "OT-COD", "MANHOLD", "MANCALLCX"
 }
 
