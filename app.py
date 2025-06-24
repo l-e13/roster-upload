@@ -554,7 +554,7 @@ elif page == "WDO Dashboard":
 
     def plot_interactive_series(data, label, color):
         df_plot = pd.DataFrame({
-            "Date": data.index.date,
+            "Date": data.index.to_series().dt.date,
             "WDO Count": data.values
         })
 
