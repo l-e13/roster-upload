@@ -214,7 +214,7 @@ if uploaded_files:
                 df_clean = clean_roster_generic(df_raw, filename)
                 df_final = rename_and_type(df_clean)
 
-                st.write("\u2705 Cleaned Data Preview")
+                st.write("Cleaned Data Preview")
                 st.dataframe(df_final.head())
 
                 if upload_to_bigquery:
