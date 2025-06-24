@@ -9,7 +9,7 @@ import io
 
 # -- Non-operations divisions (full override list)
 non_ops_divisions = {
-        "Office of the Fire Chief / Executive Chief Staff",
+    "Office of the Fire Chief / Executive Chief Staff",
     "Office of the Fire Chief / Executive Officer",
     "Information Technology Division / Information Technology Division",
     "Internal Affairs Division / IAD Staff",
@@ -139,7 +139,145 @@ non_ops_divisions = {
     "Fire Education Specialists / Fire Education Specialists"
 }
 
-# Apparatus-to-type mapping (for EMS WDO labeling only)
+
+fire_divisions = {
+    "DFC Office / Staffing Office",
+    "DFC Office / DFC Operations",
+    "BFC 1 / BFC 1",
+    "Quarters E06 / Engine 06",
+    "Quarters E06 / Truck 04",
+    "Quarters E10 / Engine 10P",
+    "Quarters E10 / Truck 13",
+    "Quarters E12 / Engine 12",
+    "Quarters E14 / Engine 14",
+    "Quarters E17 / Engine 17",
+    "Quarters E26 / Engine 26P",
+    "Quarters E26 / Truck 15",
+    "BFC 2 / BFC 2",
+    "Quarters E07 / Engine 07P",
+    "Quarters E08 / Engine 08P",
+    "Quarters E08 / Air Unit 2",
+    "Quarters E18 / Engine 18P",
+    "Quarters E18 / Truck 07",
+    "Quarters E27 / Engine 27P",
+    "Quarters E30 / Engine 30P",
+    "Quarters E30 / Truck 17",
+    "BFC 3 / BFC 3",
+    "Quarters E15 / Engine 15P",
+    "Quarters E19 / Engine 19P",
+    "Quarters E25 / Engine 25P",
+    "Quarters E32 / Engine 32P",
+    "Quarters E32 / Truck 16",
+    "Quarters E33 / Engine 33P",
+    "Quarters E33 / Truck 08",
+    "BFC 4 / BFC 4",
+    "BFC 4 / Safety Officer",
+    "Quarters E04 / Engine 04",
+    "Quarters E04 / Air Unit 1",
+    "Quarters E09 / Engine 09P",
+    "Quarters E09 / Truck 09",
+    "Quarters E11 / Engine 11P",
+    "Quarters E11 / Truck 06",
+    "Quarters E22 / Engine 22P",
+    "Quarters E22 / Truck 11",
+    "Quarters E24 / Engine 24",
+    "BFC 5 / BFC 5",
+    "Quarters E05 / Engine 05",
+    "Quarters E05 / Rehab Unit",
+    "Quarters E20 / Engine 20P",
+    "Quarters E20 / Truck 12",
+    "Quarters E21 / Engine 21",
+    "Quarters E28 / Engine 28",
+    "Quarters E28 / Truck 14",
+    "Quarters E29 / Engine 29P",
+    "Quarters E29 / Truck 05",
+    "Quarters E31 / Engine 31P",
+    "BFC 6 / BFC 6",
+    "Quarters E01 / Engine 01",
+    "Quarters E01 / Truck 02",
+    "Quarters E02 / Engine 02",
+    "Quarters E03 / Engine 03P",
+    "Quarters E13 / Engine 13P",
+    "Quarters E13 / Truck 10",
+    "Quarters E13 / Foam Unit",
+    "Quarters E16 / Engine 16P",
+    "Quarters E16 / Tower 3",
+    "Quarters E16 / Command Unit 1",
+    "Quarters E23 / Engine 23",
+    "Special Operations / Battalion Chief Special Operations",
+    "Quarters of Rescue Squad 1 / Rescue Squad 1",
+    "Quarters of Rescue Squad 2 / Rescue Squad 2",
+    "Quarters of Rescue Squad 3 / Rescue Squad 3",
+    "Quarters of Hazmat Unit 1 / Hazmat 1",
+    "Quarters of Fire Boat / Fire Boat",
+    "Quarters of Fire Boat / Fire Boat Satellite Station",
+    "Homeland Security / Fire Operations Center",
+    "Homeland Security / Rail Operations Control Center",
+    "OUC Liaison / Fire Liaison Officer",
+    "OUC Liaison / EMS Liaison Officer",
+    "Fire Prevention Division / Fire Investigations Unit"
+}
+
+ems_divisions = {
+    "DFC Office / Battalion Chief of EMS",
+    "BFC 1 / EMS 1",
+    "Quarters E06 / Ambulance 06",
+    "Quarters E10 / Medic 10",
+    "Quarters E12 / Ambulance 12",
+    "Quarters E14 / Ambulance 14",
+    "Quarters E14 / Medic 14",
+    "Quarters E17 / Medic 17",
+    "Quarters E26 / Ambulance 26",
+    "BFC 2 / EMS 2",
+    "Quarters E07 / Medic 07",
+    "Quarters E08 / Medic 08",
+    "Quarters E08 / Ambulance 08",
+    "Quarters E18 / Ambulance 18",
+    "Quarters E27 / Ambulance 27",
+    "Quarters E27 / Medic 27",
+    "Quarters E30 / Ambulance 30",
+    "Quarters E30 / Ambulance 30B",
+    "BFC 3 / EMS 3",
+    "Quarters E15 / Ambulance 15",
+    "Quarters E19 / Ambulance 19",
+    "Quarters E19 / Medic 19",
+    "Quarters E19 / Ambulance 19B",
+    "Quarters E25 / Medic 25",
+    "Quarters E25 / Ambulance 25",
+    "Quarters E32 / Ambulance 32",
+    "Quarters E33 / Ambulance 33",
+    "Quarters E33 / Medic 33",
+    "BFC 4 / EMS 4",
+    "Quarters E04 / Ambulance 04",
+    "Quarters E09 / Ambulance 09",
+    "Quarters E11 / Ambulance 11",
+    "Quarters E22 / Ambulance 22",
+    "Quarters E24 / Medic 24",
+    "BFC 5 / EMS 5",
+    "Quarters E05 / Medic 05",
+    "Quarters E20 / Ambulance 20",
+    "Quarters E21 / Medic 21",
+    "Quarters E28 / Ambulance 28",
+    "Quarters E29 / Ambulance 29",
+    "Quarters E31 / Medic 31",
+    "BFC 6 / EMS 6",
+    "Quarters E01 / Ambulance 01",
+    "Quarters E01 / Medic 01",
+    "Quarters E02 / Medic 02",
+    "Quarters E03 / Medic 03",
+    "Quarters E03 / Ambulance 03",
+    "Quarters E13 / Ambulance 13",
+    "Quarters E16 / Ambulance 16",
+    "Quarters E23 / Ambulance 23",
+    "Special Operations / EMS 7",
+    "Ambulance 51",
+    "Ambulance 52",
+    "Ambulance 53",
+    "Ambulance 54",
+    "Ambulance 55",
+    "Ambulance 56"
+}
+
 apparatus_class = {
     "Engine": "FIRE",
     "Truck": "FIRE",
@@ -156,14 +294,12 @@ apparatus_class = {
     "EMS": "EMS"
 }
 
-# WDO codes
 wdo_codes = {
     "DOW", "+DETAIL", "DET AS PEC", "TA-ANNEDU", "WDO", "+OTC", "BN", "FFD", "DETAIL",
     "+EMS (FF)", "+EMS (PM)", "+CITYWIDE", "EMS/DOTW", "EMS SUPER",
     "OT-COD", "MANHOLD", "MANCALLCX"
 }
 
-# Streamlit config
 st.set_page_config(page_title="Roster Ingestion", layout="centered")
 pwd = st.sidebar.text_input("Password", type="password")
 if not pwd or pwd != st.secrets["app"]["app_password"]:
@@ -174,13 +310,11 @@ if not pwd or pwd != st.secrets["app"]["app_password"]:
     st.stop()
 st.success("Access granted.")
 
-# BigQuery client setup
 def get_bigquery_client():
     creds_dict = st.secrets["bigquery"]["credentials"]
     creds = service_account.Credentials.from_service_account_info(creds_dict)
     return bigquery.Client(credentials=creds, project=st.secrets["bigquery"]["project"])
 
-# Extract date from filename
 def extract_date_from_filename(fname):
     patterns = [
         {'regex': r'(\d{4}-\d{1,2}-\d{1,2})', 'formats': ['%Y-%m-%d']},
@@ -199,7 +333,6 @@ def extract_date_from_filename(fname):
                     continue
     return None
 
-# Clean Excel file
 def clean_roster_generic(df, filename):
     df2 = df.iloc[:, 1:].copy() if df.shape[1] > 1 else df.copy()
     df2.columns = [f"column_{i+1}" for i in range(df2.shape[1])]
@@ -230,7 +363,6 @@ def clean_roster_generic(df, filename):
     df2 = df2[[c for c in col_order if c in df2.columns]]
     return df2.rename(columns={c: f"column_{i+1}" for i, c in enumerate(df2.columns)})
 
-# Rename and classify
 def rename_and_type(df):
     rename_map = {
         "column_1": "division",
@@ -260,15 +392,6 @@ def rename_and_type(df):
             df2[col] = df2[col].apply(to_string_time)
 
     df2['wdo_flag'] = df2['code'].isin(wdo_codes)
-
-    def get_ops_type(division):
-        if pd.isna(division):
-            return None
-        division = str(division).strip()
-        if division in non_ops_divisions:
-            return None
-        return "FIRE" if "Fire" in division and "EMS" not in division else ("EMS" if "EMS" in division else None)
-
     df2['ops_type'] = df2['division'].apply(get_ops_type)
 
     def assign_wdo_category(row):
@@ -284,7 +407,6 @@ def rename_and_type(df):
     df2['wdo_category'] = df2.apply(assign_wdo_category, axis=1)
     return df2.where(pd.notnull(df2), None)
 
-# Upload logic
 def push_to_bigquery(df, table_id):
     client = get_bigquery_client()
     csv_buffer = io.StringIO()
@@ -317,7 +439,6 @@ def log_upload_event(filename, row_count, status):
     if errors:
         st.warning(f"\u26a0\ufe0f Failed to log upload for {filename}: {errors}")
 
-# Streamlit UI
 st.header("Upload Rosters")
 upload_to_bigquery = st.checkbox("Upload to BigQuery", value=False)
 uploaded_files = st.file_uploader("Choose Excel files", type=["xls", "xlsx"], accept_multiple_files=True)
