@@ -233,5 +233,5 @@ if uploaded_files:
                 log_upload_event(filename, 0, f"error: {str(e)}")
                 summary.append((filename, "error", 0))
 
-        st.write("## \ud83d\udcca Upload Summary")
+        st.write("##Upload Summary")
         st.dataframe(pd.DataFrame(summary, columns=["filename", "status", "row_count"]))
