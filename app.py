@@ -538,7 +538,7 @@ elif page == "WDO Dashboard":
       roster_date,
       ops_type,
       COUNT(*) AS wdo_count
-    FROM `your_project.rosters.roster_data`
+    FROM `disco-ivy-463814-n0.rosters.roster_data`
     WHERE wdo_flag = TRUE
     GROUP BY roster_date, ops_type
     """
