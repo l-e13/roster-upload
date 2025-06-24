@@ -216,7 +216,12 @@ fire_divisions = {
     "OUC Liaison / Fire Liaison Officer",
     "OUC Liaison / EMS Liaison Officer",
     "Fire Prevention Division / Fire Investigations Unit",
-    "Quarters E09 / Engine 09P/Station Security"
+    "Quarters E09 / Engine 09P/Station Security",
+    "Battalion 8 Apparatus / Engine 34",
+    "Battalion 8 Apparatus / Engine 35",
+    "Battalion 8 Apparatus / Engine 36",
+    "Battalion 8 Apparatus / Engine 37",
+    "Battalion 8 Apparatus / Truck 34"
 }
 
 ems_divisions = {
