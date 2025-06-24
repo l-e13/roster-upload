@@ -532,6 +532,9 @@ if uploaded_files:
 elif page == "WDO Dashboard":
     st.header("WDO Dashboard Tester")
 
+    import plotly.express as px
+    import pandas as pd
+
     # Query BigQuery
     sql = """
     SELECT 
@@ -549,31 +552,29 @@ elif page == "WDO Dashboard":
     df_pivot = df.pivot(index="roster_date", columns="ops_type", values="wdo_count").fillna(0)
     df_pivot["TOTAL"] = df_pivot.get("FIRE", 0) + df_pivot.get("EMS", 0)
 
-    import matplotlib.pyplot as plt
-    import numpy as np
+    def plot_interactive_series(data, label, color):
+        df_plot = pd.DataFrame({
+            "Date": data.index,
+            "WDO Count": data.values
+        })
 
-    def plot_distribution(data, label, color='blue'):
-        fig, ax = plt.subplots()
-        counts = data.dropna()
-        mean = counts.mean()
-        std = counts.std()
+        mean = data.mean()
+        std = data.std()
 
-        ax.hist(counts, bins=20, color=color, edgecolor='black', alpha=0.7)
-        ax.axvline(mean, color='red', linestyle='dashed', linewidth=2, label=f"Mean = {mean:.2f}")
-        ax.axvline(mean + std, color='green', linestyle='dotted', linewidth=2, label=f"+1 SD = {mean+std:.2f}")
-        ax.axvline(mean - std, color='green', linestyle='dotted', linewidth=2, label=f"-1 SD = {mean-std:.2f}")
-        ax.set_title(f"{label} WDO per Day")
-        ax.set_xlabel("WDO Count")
-        ax.set_ylabel("Days")
-        ax.legend()
-        st.pyplot(fig)
+        fig = px.bar(df_plot, x="Date", y="WDO Count", title=f"{label} WDO per Day", color_discrete_sequence=[color])
+        fig.add_hline(y=mean, line_dash="dash", line_color="red", annotation_text=f"Mean = {mean:.2f}", annotation_position="top left")
+        fig.add_hline(y=mean + std, line_dash="dot", line_color="green", annotation_text=f"+1 SD = {mean + std:.2f}")
+        fig.add_hline(y=mean - std, line_dash="dot", line_color="green", annotation_text=f"-1 SD = {mean - std:.2f}")
+        fig.update_layout(xaxis_title="Date", yaxis_title="WDO Count")
+        st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Fire WDO Per Day")
-    plot_distribution(df_pivot["FIRE"], "Fire", color='orange')
+    plot_interactive_series(df_pivot["FIRE"], "Fire", color="orange")
 
     st.subheader("EMS WDO Per Day")
-    plot_distribution(df_pivot["EMS"], "EMS", color='blue')
+    plot_interactive_series(df_pivot["EMS"], "EMS", color="blue")
 
     st.subheader("Total WDO Per Day")
-    plot_distribution(df_pivot["TOTAL"], "Total", color='purple')
+    plot_interactive_series(df_pivot["TOTAL"], "Total", color="purple")
+
 
