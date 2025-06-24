@@ -7,6 +7,23 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 import io
 
+
+st.set_page_config(page_title="Roster Ingestion", layout="centered")
+pwd = st.sidebar.text_input("Password", type="password")
+if not pwd or pwd != st.secrets["app"]["app_password"]:
+    st.title("Roster Ingestion App")
+    st.write("Enter the password to continue.")
+    if pwd:
+        st.error("Incorrect password")
+    st.stop()
+st.success("Access granted.")
+
+page = st.sidebar.selectbox("Select a page", ["Roster Upload", "WDO Dashboard"])
+
+if page == "Roster Upload":
+    st.header("Upload Rosters")
+
+
 # -- Non-operations divisions (full override list)
 non_ops_divisions = {
     "Office of the Fire Chief / Executive Chief Staff",
@@ -326,15 +343,7 @@ wdo_codes = {
     "OT-COD", "MANHOLD", "MANCALLCX"
 }
 
-st.set_page_config(page_title="Roster Ingestion", layout="centered")
-pwd = st.sidebar.text_input("Password", type="password")
-if not pwd or pwd != st.secrets["app"]["app_password"]:
-    st.title("Roster Ingestion App")
-    st.write("Enter the password to continue.")
-    if pwd:
-        st.error("Incorrect password")
-    st.stop()
-st.success("Access granted.")
+
 
 def get_bigquery_client():
     creds_dict = st.secrets["bigquery"]["credentials"]
@@ -518,3 +527,27 @@ if uploaded_files:
 
         st.write("Upload Summary")
         st.dataframe(pd.DataFrame(summary, columns=["filename", "status", "row_count"]))
+
+
+elif page == "WDO Dashboard":
+    st.header("WDO Dashboard Tester")
+
+    # Example BigQuery SQL
+    sql = """
+    SELECT 
+      roster_date,
+      ops_type,
+      COUNT(*) AS wdo_count
+    FROM `your_project.rosters.roster_data`
+    WHERE wdo_flag = TRUE
+    GROUP BY roster_date, ops_type
+    """
+
+    client = get_bigquery_client()
+    df = client.query(sql).to_dataframe()
+
+    # Fill in FIRE / EMS / TOTAL rows even if missing
+    df_pivot = df.pivot(index="roster_date", columns="ops_type", values="wdo_count").fillna(0)
+    df_pivot["TOTAL"] = df_pivot.get("FIRE", 0) + df_pivot.get("EMS", 0)
+
+    st.line_chart(df_pivot)
