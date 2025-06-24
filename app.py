@@ -415,12 +415,17 @@ def rename_and_type(df):
     def assign_wdo_category(row):
         if not row.get('wdo_flag'):
             return None
-        if row.get('code') == '+EMS':
-            if 'Medic' in row.get('division', ''):
-                return '+EMS (PM)' if '(PM)' in str(row.get('name')) else '+EMS (FF)'
-            elif 'Ambulance' in row.get('division', ''):
+        code = row.get('code')
+        division = str(row.get('division', '')).upper()
+        rank = str(row.get('rank', '')).upper()
+
+        if code == '+EMS':
+            if 'MEDIC' in division:
+                return '+EMS (PM)' if 'PARAMEDIC' in rank else '+EMS (FF)'
+            elif 'AMBULANCE' in division:
                 return '+EMS (FF)'
         return f"{row.get('ops_type')} WDO"
+
 
     df2['wdo_category'] = df2.apply(assign_wdo_category, axis=1)
     return df2.where(pd.notnull(df2), None)
@@ -475,6 +480,15 @@ if uploaded_files:
 
                 st.write("Cleaned Data Preview")
                 st.dataframe(df_final.head(30))
+
+                csv_download = df_final.to_csv(index=False).encode('utf-8')
+                st.download_button(
+                    label="Download CSV",
+                    data=csv_download,
+                    file_name=f"{filename.replace('.xlsx', '').replace('.xls', '')}_cleaned.csv",
+                    mime='text/csv'
+            )
+
 
                 if upload_to_bigquery:
                     st.info("Uploading to BigQuery...")
