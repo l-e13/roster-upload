@@ -4,3 +4,4 @@ openpyxl
 google-cloud-bigquery
 google-auth
 db-dtypes
+matplotlib
