@@ -24,7 +24,7 @@ apparatus_class = {
     "EMS": "EMS"
 }
 
-# WDO codes (to be updated with your final list)
+# WDO codes (from OPERATIONS - Working section, excluding REG)
 wdo_codes = {
     # FIRE
     "DOW", "+DETAIL", "DET AS PEC", "TA-ANNEDU", "WDO", "+OTC", "BN", "FFD", "DETAIL",
@@ -106,7 +106,6 @@ def clean_roster_generic(df, filename):
     return df2.rename(columns={c: f"column_{i+1}" for i, c in enumerate(df2.columns)})
 
 # Rename and classify
-
 def rename_and_type(df):
     rename_map = {
         "column_1": "division",
@@ -137,10 +136,17 @@ def rename_and_type(df):
 
     df2['wdo_flag'] = df2['code'].isin(wdo_codes)
 
-    def get_ops_type(unit):
-        for key, val in apparatus_class.items():
-            if pd.notna(unit) and key in unit:
-                return val
+    def get_ops_type(division):
+        if pd.isna(division):
+            return None
+        division = str(division).strip()
+        for keyword, value in apparatus_class.items():
+            if keyword in division:
+                return value
+        if "Fire" in division and "EMS" not in division:
+            return "FIRE"
+        if "EMS" in division:
+            return "EMS"
         return None
 
     df2['ops_type'] = df2['division'].apply(get_ops_type)
@@ -194,7 +200,7 @@ def log_upload_event(filename, row_count, status):
     }]
     errors = client.insert_rows_json(log_table_id, rows_to_insert)
     if errors:
-        st.warning(f"\u26a0\ufe0f Failed to log upload for {filename}: {errors}")
+        st.warning(f"⚠️ Failed to log upload for {filename}: {errors}")
 
 # UI logic
 st.title("Roster Report Ingestion")
@@ -214,24 +220,24 @@ if uploaded_files:
                 df_clean = clean_roster_generic(df_raw, filename)
                 df_final = rename_and_type(df_clean)
 
-                st.write("Cleaned Data Preview")
+                st.write("✅ Cleaned Data Preview")
                 st.dataframe(df_final.head())
 
                 if upload_to_bigquery:
-                    st.info("\ud83d\udce4 Uploading to BigQuery...")
+                    st.info("📤 Uploading to BigQuery...")
                     row_count = push_to_bigquery(df_final, table_id)
-                    st.success(f"\u2705 Uploaded {row_count} rows.")
+                    st.success(f"✅ Uploaded {row_count} rows.")
                     log_upload_event(filename, row_count, "success")
                     summary.append((filename, "success", row_count))
                 else:
-                    st.warning("\u23f8\ufe0f Skipped BigQuery upload (preview only).")
+                    st.warning("⏸️ Skipped BigQuery upload (preview only).")
                     log_upload_event(filename, len(df_final), "preview only")
                     summary.append((filename, "preview only", len(df_final)))
 
             except Exception as e:
-                st.error(f"\u274c Error processing '{filename}': {e}")
+                st.error(f"❌ Error processing '{filename}': {e}")
                 log_upload_event(filename, 0, f"error: {str(e)}")
                 summary.append((filename, "error", 0))
 
-        st.write("##Upload Summary")
+        st.write("## 📊 Upload Summary")
         st.dataframe(pd.DataFrame(summary, columns=["filename", "status", "row_count"]))
