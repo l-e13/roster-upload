@@ -277,7 +277,8 @@ ems_divisions = {
     "Ambulance 54",
     "Ambulance 55",
     "Ambulance 56",
-    "Quarters E14 / Ambulance 14"
+    "Quarters E14 / Ambulance 14",
+    "Quarters E30 / Medic 30"
 }
 
 apparatus_class = {
