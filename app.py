@@ -415,11 +415,13 @@ def rename_and_type(df):
     def assign_wdo_category(row):
         if not row.get('wdo_flag'):
             return None
-        code = row.get('code')
+
+        code = str(row.get('code', '')).strip().upper()
         division = str(row.get('division', '')).upper()
         rank = str(row.get('rank', '')).upper()
 
         if code == '+EMS':
+            # Prioritize identifying Paramedic vs FF
             if 'MEDIC' in division:
                 return '+EMS (PM)' if 'PARAMEDIC' in rank else '+EMS (FF)'
             elif 'AMBULANCE' in division:
