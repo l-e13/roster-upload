@@ -221,7 +221,7 @@ if uploaded_files:
                 df_final = rename_and_type(df_clean)
 
                 st.write("✅ Cleaned Data Preview")
-                st.dataframe(df_final.head())
+                st.dataframe(df_final.head(15))
 
                 if upload_to_bigquery:
                     st.info("📤 Uploading to BigQuery...")
