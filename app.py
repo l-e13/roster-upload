@@ -96,7 +96,6 @@ def rename_and_type(df):
 
     df2 = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
 
-    # Clean leading dots in rank
     if "rank" in df2.columns:
         df2["rank"] = (
             df2["rank"]
@@ -144,6 +143,41 @@ def rename_and_type(df):
 
     return df2.where(pd.notnull(df2), None)
 
+# Classification helpers
+def classify_assignment_type(row):
+    div = str(row.get("division", "")).lower()
+    rank = str(row.get("rank", "")).lower()
+    fire_keywords = [
+        "engine", "truck", "rescue squad", "fire boat", "foam unit",
+        "hazmat", "tower", "command unit", "staffing office", "dfc operations",
+        "safety officer", "fire investigations", "battalion chief special operations"
+    ]
+    ems_keywords = [
+        "medic", "ambulance", "ems liaison", "ems", "citywide",
+        "battalion chief of ems"
+    ]
+    if any(k in div for k in fire_keywords) or any(k in rank for k in fire_keywords):
+        return "FIRE"
+    elif any(k in div for k in ems_keywords) or any(k in rank for k in ems_keywords):
+        return "EMS"
+    else:
+        return "NON OPS"
+
+def classify_subcode(row):
+    code = str(row.get("code", "")).strip().upper()
+    rank = str(row.get("rank", "")).lower()
+    name = str(row.get("name", "")).lower()
+    if "paramedic" in rank or "(pm)" in name:
+        return "+EMS(PM)"
+    elif "emt" in rank:
+        return "+EMS(FF)"
+    elif code in ["REG", "WDO"]:
+        return f"+{code}"
+    elif code.startswith("+"):
+        return code
+    else:
+        return "+OTHER"
+
 # Upload to BigQuery
 def push_to_bigquery(df, table_id):
     client = get_bigquery_client()
@@ -181,7 +215,7 @@ def log_upload_event(filename, row_count, status):
 
     errors = client.insert_rows_json(log_table_id, rows_to_insert)
     if errors:
-        st.warning(f"⚠️ Failed to log upload for {filename}: {errors}")
+        st.warning(f"\u26a0\ufe0f Failed to log upload for {filename}: {errors}")
 
 # UI logic
 st.title("Roster Report Ingestion")
@@ -201,25 +235,30 @@ if uploaded_files:
                 df_clean = clean_roster_generic(df_raw, filename)
                 df_final = rename_and_type(df_clean)
 
-                st.write("✅ Cleaned Data Preview")
+                # Apply classification
+                df_final["assignment_type"] = df_final.apply(classify_assignment_type, axis=1)
+                df_final["subcode"] = df_final.apply(classify_subcode, axis=1)
+
+                st.write("\u2705 Cleaned & Classified Data Preview")
                 st.dataframe(df_final.head())
 
                 if upload_to_bigquery:
-                    st.info("📤 Uploading to BigQuery...")
+                    st.info("\ud83d\udce4 Uploading to BigQuery...")
                     row_count = push_to_bigquery(df_final, table_id)
-                    st.success(f"✅ Uploaded {row_count} rows.")
+                    st.success(f"\u2705 Uploaded {row_count} rows.")
                     log_upload_event(filename, row_count, "success")
                     summary.append((filename, "success", row_count))
                 else:
-                    st.warning("⏸️ Skipped BigQuery upload (preview only).")
+                    st.warning("\u23f8\ufe0f Skipped BigQuery upload (preview only).")
                     log_upload_event(filename, len(df_final), "preview only")
                     summary.append((filename, "preview only", len(df_final)))
 
             except Exception as e:
-                st.error(f"❌ Error processing '{filename}': {e}")
+                st.error(f"\u274c Error processing '{filename}': {e}")
                 log_upload_event(filename, 0, f"error: {str(e)}")
                 summary.append((filename, "error", 0))
 
-        st.write("## 📊 Upload Summary")
+        st.write("## \ud83d\udcca Upload Summary")
         st.dataframe(pd.DataFrame(summary, columns=["filename", "status", "row_count"]))
+
 
