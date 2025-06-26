@@ -442,7 +442,8 @@ def rename_and_type(df):
         if col in df2.columns:
             df2[col] = df2[col].apply(to_string_time)
 
-    df2['wdo_flag'] = df2['code'].isin(wdo_codes)
+    df2['wdo_flag'] = df2['code'].astype(str).str.strip().str.upper().isin(wdo_codes)
+
     df2['ops_type'] = df2['division'].apply(get_ops_type)
 
     def reclassify_ops_subtype(row):
