@@ -462,9 +462,17 @@ def rename_and_type(df):
 
     df2['ops_subtype'] = df2.apply(reclassify_ops_subtype, axis=1)
 
-    # Override ops_type if applicable
-    df2.loc[df2['ops_subtype'] == "OPS-NW", 'ops_type'] = "NON-OPS"
-    df2.loc[df2['ops_subtype'] == "OPS-DOO", 'ops_type'] = "NON-OPS"
+
+    df2.loc[
+        (df2['ops_subtype'] == "OPS-NW") & (df2['ops_type'] != "NON-OPS"),
+        'ops_type'
+    ] = "OPS-NW"
+
+    df2.loc[
+        (df2['ops_subtype'] == "OPS-DOO") & (df2['ops_type'] != "NON-OPS"),
+        'ops_type'
+    ] = "OPS-DOO"
+
 
 
     def assign_wdo_category(row):
