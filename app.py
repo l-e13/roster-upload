@@ -443,17 +443,14 @@ def rename_and_type(df):
             df2[col] = df2[col].apply(to_string_time)
 
     df2['wdo_flag'] = df2['code'].isin(wdo_codes)
-    if "DETAIL" in df2['code'].astype(str).str.upper().unique():
-        df_detail = df2[df2['code'].astype(str).str.upper() == "DETAIL"]
-        st.warning("⚠️ DETAIL rows found:")
-        st.dataframe(df_detail[['division', 'code', 'wdo_flag']])
+
 
 
     df2['ops_type'] = df2['division'].apply(get_ops_type)
 
     def reclassify_ops_subtype(row):
         code = str(row.get('code', '')).strip().upper()
-        division = str(row.get('division', '')).strip().upper()
+        division = normalize_division_name(row.get('division', ''))
         
         if division in {normalize_division_name(d) for d in non_ops_divisions}:
             return None
