@@ -336,11 +336,29 @@ def get_ops_type(division):
 
 
 wdo_codes = {
-    "DOW", "+DETAIL", "DET AS PEC", "TA-ANNEDU", "WDO", "+WDO", "+OTC", "BN", "FFD", "DETAIL",
-    "+EMS (FF)", "+EMS (PM)", "+EMS", "+CITYWIDE", "EMS/DOTW", "EMS SUPER",
+    "DOW", "DET AS PEC", "TA-ANNEDU", "WDO", "+WDO",
+    "+EMS (FF)", "+EMS (PM)", "+EMS", "EMS/DOTW", "EMS SUPER",
     "OT-COD", "MANHOLD", "MANCALLCX"
 }
 
+# OPS (Not Working)
+ops_nw_codes = {
+    'ALP', 'AL', 'EAL', 'HOL', 'MIP', 'SLT', 'POD', 'DOT', 'PFL', 'FMLA', 'COMP', 'BEV',
+    'MILI', 'JURY', 'RESIGN', 'LWOP', 'SWOP', 'AWOL', 'AWOP', 'ENLV', 'ADL IA', 'LD', 'LDOIA',
+    '.ALP', '.AL', 'HOL/MIP', '.MIP', 'SL', '.POD', 'PFLU', 'AL/FMLA', 'COMPT', '.BEV',
+    '.SL', 'PFLTT', 'FMSK', 'COMPS', '.COMPT', 'FMLW', 'FMCS', '.COMPS', 'ENLV-AL', 'ENLV-SL',
+    'LDPFC', 'LD/AFC-MES', 'LD02X', 'LD/AFCO', 'LDRTO', 'LD/ATC-OPS', 'LD/BULLETIN12',
+    'AL LIEU SL', 'HOL/PFL', 'HOL/SLT', 'DOTW/SL', 'ALTU', 'ALTS', 'RLT'
+}
+ops_nw_codes = {c.strip().upper() for c in ops_nw_codes}
+
+# OPS (Detailed Outside Operations)
+ops_doo_codes = {
+    "FIRE-TA", "NFA", "ADL TRAIN", "AD", "OFC", "OMD", "ODIV", "OUC", "PEERDET", "GUARD", 
+    "DETAIL PFC", "USAR", "ROCC", "DETAIL-SE", "TRBD", "FP", "L36", "L3721", "ADMIN", 
+    "BURN", "ADL PFC", "PFL/DCHR", "PFFA", "ADL COURT", "ADL RETIRE", "FUNERAL", ".ADL ALSTRN"
+}
+ops_doo_codes = {c.strip().upper() for c in ops_doo_codes}
 
 
 def get_bigquery_client():
@@ -426,6 +444,23 @@ def rename_and_type(df):
 
     df2['wdo_flag'] = df2['code'].isin(wdo_codes)
     df2['ops_type'] = df2['division'].apply(get_ops_type)
+
+    def reclassify_ops_subtype(row):
+        code = str(row.get('code', '')).strip().upper()
+        division = str(row.get('division', '')).strip().upper()
+
+        if code in ops_nw_codes:
+            return "OPS-NW"
+        if code in ops_doo_codes or "FIRE-TA" in division:
+            return "OPS-DOO"
+        return None
+
+    df2['ops_subtype'] = df2.apply(reclassify_ops_subtype, axis=1)
+
+    # Override ops_type if applicable
+    df2.loc[df2['ops_subtype'] == "OPS-NW", 'ops_type'] = "NON-OPS"
+    df2.loc[df2['ops_subtype'] == "OPS-DOO", 'ops_type'] = "NON-OPS"
+
 
     def assign_wdo_category(row):
         if not row.get('wdo_flag'):
