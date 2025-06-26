@@ -452,6 +452,8 @@ def rename_and_type(df):
     df2['ops_type'] = df2['division'].apply(get_ops_type)
 
     def reclassify_ops_subtype(row):
+        if row.get('ops_type') == 'NON-OPS':
+            return None
         code = str(row.get('code', '')).strip().upper()
         division = str(row.get('division', '')).strip().upper()
 
