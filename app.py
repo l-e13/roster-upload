@@ -452,11 +452,11 @@ def rename_and_type(df):
     df2['ops_type'] = df2['division'].apply(get_ops_type)
 
     def reclassify_ops_subtype(row):
-        if row.get('ops_type') == 'NON-OPS':
-            return None
         code = str(row.get('code', '')).strip().upper()
         division = str(row.get('division', '')).strip().upper()
-
+        
+        if division in {normalize_division_name(d) for d in non_ops_divisions}:
+            return None
         if code in ops_nw_codes:
             return "OPS-NW"
         if code in ops_doo_codes or "FIRE-TA" in division:
