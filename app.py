@@ -451,14 +451,18 @@ def rename_and_type(df):
     def reclassify_ops_subtype(row):
         code = str(row.get('code', '')).strip().upper()
         division = normalize_division_name(row.get('division', ''))
-        
-        if division in {normalize_division_name(d) for d in non_ops_divisions}:
-            return None
+
+        # Ensure exact normalized match
+        non_ops_normalized = {normalize_division_name(d) for d in non_ops_divisions}
+        if division in non_ops_normalized:
+            return None  # Do not assign subtype if NON-OPS
+
         if code in ops_nw_codes:
             return "OPS-NW"
         if code in ops_doo_codes or "FIRE-TA" in division:
             return "OPS-DOO"
         return None
+
 
     df2['ops_subtype'] = df2.apply(reclassify_ops_subtype, axis=1)
 
@@ -473,6 +477,7 @@ def rename_and_type(df):
         'ops_type'
     ] = "OPS-DOO"
 
+    st.write("Subtype Check", df2[df2['code'].str.upper().isin(['.AL', 'MIP'])][['division', 'code', 'ops_type', 'ops_subtype']])
 
 
     def assign_wdo_category(row):
