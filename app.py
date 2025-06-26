@@ -467,16 +467,6 @@ def rename_and_type(df):
     df2['ops_subtype'] = df2.apply(reclassify_ops_subtype, axis=1)
 
 
-    df2.loc[
-        (df2['ops_subtype'] == "OPS-NW") & (df2['ops_type'] != "NON-OPS"),
-        'ops_type'
-    ] = "OPS-NW"
-
-    df2.loc[
-        (df2['ops_subtype'] == "OPS-DOO") & (df2['ops_type'] != "NON-OPS"),
-        'ops_type'
-    ] = "OPS-DOO"
-
     st.write("Subtype Check", df2[df2['code'].str.upper().isin(['.AL', 'MIP'])][['division', 'code', 'ops_type', 'ops_subtype']])
 
 
