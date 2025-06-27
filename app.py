@@ -455,11 +455,11 @@ def rename_and_type(df):
     def reclassify_ops_subtype(row):
         code = str(row.get('code', '')).strip().upper()
         division = normalize_division_name(row.get('division', ''))
+        ops_type = row.get('ops_type', '').strip().upper()
 
-        # Ensure exact normalized match
-        non_ops_normalized = {normalize_division_name(d) for d in non_ops_divisions}
-        if division in non_ops_normalized:
-            return None  # Do not assign subtype if NON-OPS
+        # Only allow subtype for FIRE or EMS
+        if ops_type not in {"FIRE", "EMS"}:
+            return None
 
         if code in ops_nw_codes:
             return "OPS-NW"
