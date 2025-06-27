@@ -471,8 +471,6 @@ def rename_and_type(df):
     df2['ops_subtype'] = df2.apply(reclassify_ops_subtype, axis=1)
 
 
-    st.write("Subtype Check", df2[df2['code'].str.upper().isin(['.AL', 'MIP'])][['division', 'code', 'ops_type', 'ops_subtype']])
-
 
     def assign_wdo_category(row):
         if not row.get('wdo_flag'):
