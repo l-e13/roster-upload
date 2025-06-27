@@ -354,7 +354,7 @@ ops_nw_codes = {c.strip().upper() for c in ops_nw_codes}
 
 # OPS (Detailed Outside Operations)
 ops_doo_codes = {
-    "FIRE-TA", "NFA", "ADL TRAIN", "AD", "OFC", "OMD", "ODIV", "OUC", "PEERDET", "GUARD", 
+    "FIRE-TA", "NFA", "ADL TRAIN", ".ADL TRAIN", "AD", "OFC", "OMD", "ODIV", "OUC", "PEERDET", "GUARD", 
     "DETAIL PFC", "USAR", "ROCC", "DETAIL-SE", "TRBD", "FP", "L36", "L3721", "ADMIN", 
     "BURN", "ADL PFC", "PFL/DCHR", "PFFA", "ADL COURT", "ADL RETIRE", "FUNERAL", ".ADL ALSTRN"
 }
@@ -427,6 +427,10 @@ def rename_and_type(df):
         "column_9": "roster_date"
     }
     df2 = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
+
+    if 'rank' in df2.columns:
+        df2['rank'] = df2['rank'].astype(str).str.lstrip('.').str.strip()
+
 
     def to_string_time(val):
         if isinstance(val, time):
