@@ -329,6 +329,8 @@ def get_ops_type(division, code=None):
         code = str(code).strip().upper()
         if code in limited_all:
             return "LIMITED"
+        if code == "+OT-COD":
+            return "COD"
 
     division_clean = normalize_division_name(division)
     if division_clean in {normalize_division_name(d) for d in non_ops_divisions}:
