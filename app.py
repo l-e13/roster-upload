@@ -321,6 +321,19 @@ apparatus_class = {
     "EMS": "EMS"
 }
 
+wdo_other_ops_codes = {
+    "+OT-TA-ADM", "+OT-ISTO", "+OT-TA-INST", "+OT-RECERT", "+OT-SIMLAB", "+OT-TA-STUD",
+    "+OT-SPOPS", "+OT-SSO", "+OT-USAR", "+OT-MARINE", "+OT-ROCC",
+    "+OT-ARSON", "+OT-CANINE", "+OT-FIU",
+    "+OT-OMD", "+OT-HOH",
+    "+OTSE", "EPO", "+OT-FEDERAL",
+    "+OT-Fleet", "+OT-AD", "+OT-UL", "+OT-APP_COMM",
+    "+OT-LOGS", "+OT-PMD",
+    "+OT-PEER",
+    "+OT-FPD",
+    "+OT-ADMIN", "+OT-COURT", "+OT-CPAT", "+OT-GUARD", "+OT-TS", "+OT-IT", "+OT-H&S"
+}
+
 def normalize_division_name(name):
     return str(name).strip().upper() if name else ""
 
@@ -492,6 +505,8 @@ def rename_and_type(df):
             return None
 
         code = str(row.get('code', '')).strip().upper()
+        if code in wdo_other_ops_codes:
+            return "WDO Other Ops"
         division = str(row.get('division', '')).upper()
         rank = str(row.get('rank', '')).upper()
         name = str(row.get('name', '')).upper()
