@@ -350,7 +350,7 @@ def get_ops_type(division, code=None):
         if code == "+OT-COD":
             return "COD"
 
-    division_clean = normalize_division_name(division)
+    division_clean = clean_division_string(division)
     if division_clean in {normalize_division_name(d) for d in non_ops_divisions}:
         return "NON-OPS"
     elif division_clean in {normalize_division_name(d) for d in fire_divisions}:
