@@ -532,6 +532,10 @@ def rename_and_type(df):
         name = str(row.get('name', '')).upper()
         ops_type = str(row.get('ops_type', '')).upper()
 
+    # DEBUG
+        if ops_type == "EMS":
+            print("DEBUG EMS WDO | Name:", name, "| Rank:", rank)
+
         if code in wdo_other_ops_codes:
             return "WDO Other Ops"
 
@@ -542,8 +546,6 @@ def rename_and_type(df):
                 return 'EMS WDO (FF)'
 
         return f"{ops_type} WDO"
-
-
 
     df2['wdo_category'] = df2.apply(assign_wdo_category, axis=1)
     return df2.where(pd.notnull(df2), None)
