@@ -531,7 +531,7 @@ def rename_and_type(df):
 
 
         if ops_type == "EMS" and row.get("wdo_flag"):
-            if 'PM' in rank or '(PM)' in name:
+            if 'PM' in rank or 'PM' in name:
                 return 'EMS WDO (PM)'
             else:
                 return 'EMS WDO (FF)'
