@@ -512,8 +512,8 @@ def rename_and_type(df):
             row['ops_type'] = "LIMITED"
             return "issues"
         
-        if code == '+EMS':
-            if 'PM' in rank or '(PM)' in name:
+        if code == '+EMS' and ops_type == "EMS":
+            if 'PM' in rank or '(PM)' in name or 'PM' in name:
                 return "+EMS (PM)"
             else:
                 return "+EMS (FF)"
