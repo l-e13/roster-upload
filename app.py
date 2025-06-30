@@ -324,7 +324,12 @@ apparatus_class = {
 def normalize_division_name(name):
     return str(name).strip().upper() if name else ""
 
-def get_ops_type(division):
+def get_ops_type(division, code=None):
+    if code:
+        code = str(code).strip().upper()
+        if code in limited_all:
+            return "LIMITED"
+
     division_clean = normalize_division_name(division)
     if division_clean in {normalize_division_name(d) for d in non_ops_divisions}:
         return "NON-OPS"
@@ -332,7 +337,6 @@ def get_ops_type(division):
         return "FIRE"
     elif division_clean in {normalize_division_name(d) for d in ems_divisions}:
         return "EMS"
-    # Fallback based on keywords
     for key, val in apparatus_class.items():
         if key in division_clean:
             return val
