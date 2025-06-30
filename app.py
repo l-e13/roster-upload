@@ -527,21 +527,22 @@ def rename_and_type(df):
             return None
 
         code = str(row.get('code', '')).strip().upper()
-        if code in wdo_other_ops_codes:
-            return "WDO Other Ops"
         division = str(row.get('division', '')).upper()
         rank = str(row.get('rank', '')).upper()
         name = str(row.get('name', '')).upper()
         ops_type = str(row.get('ops_type', '')).upper()
 
+        if code in wdo_other_ops_codes:
+            return "WDO Other Ops"
 
-        if ops_type == "EMS" and row.get("wdo_flag"):
-            if 'PM' in rank or 'PM' in name:
+        if ops_type == "EMS":
+            if 'PM' in rank or '(PM)' in name:
                 return 'EMS WDO (PM)'
             else:
                 return 'EMS WDO (FF)'
-            
+
         return f"{ops_type} WDO"
+
 
 
     df2['wdo_category'] = df2.apply(assign_wdo_category, axis=1)
