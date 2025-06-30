@@ -337,6 +337,11 @@ wdo_other_ops_codes = {
 def normalize_division_name(name):
     return str(name).strip().upper() if name else ""
 
+def clean_division_string(text):
+    if not text:
+        return ""
+    return re.sub(r'\s*\[.*?\]', '', text).strip().upper()
+
 def get_ops_type(division, code=None):
     if code:
         code = str(code).strip().upper()
