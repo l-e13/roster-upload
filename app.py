@@ -21,6 +21,10 @@ st.success("Access granted.")
 page = st.sidebar.selectbox("Select a page", ["Roster Upload", "WDO Dashboard"])
 
 
+limited_injury_codes = {"LD", "LDPFC", "LD02X", "LDRTO"}
+limited_issues_codes = {"LDOIA", "LD/AFC-MES", "LD/AFCO", "LD/ATC-OPS", "LD/BULLETIN12"}
+limited_all = limited_injury_codes | limited_issues_codes
+
 
 # -- Non-operations divisions (full override list)
 non_ops_divisions = {
@@ -457,14 +461,18 @@ def rename_and_type(df):
         division = normalize_division_name(row.get('division', ''))
         ops_type = row.get('ops_type', '').strip().upper()
 
-        # Only allow subtype for FIRE or EMS
-        if ops_type not in {"FIRE", "EMS"}:
-            return None
+        if code in limited_injury_codes:
+            row['ops_type'] = "LIMITED"
+            return "injury"
+        if code in limited_issues_codes:
+            row['ops_type'] = "LIMITED"
+            return "issues"
 
-        if code in ops_nw_codes:
-            return "OPS-NW"
-        if code in ops_doo_codes or "FIRE-TA" in division:
-            return "OPS-DOO"
+        if ops_type in {"FIRE", "EMS"}:
+            if code in ops_nw_codes:
+                return "OPS-NW"
+            if code in ops_doo_codes or "FIRE-TA" in division:
+                return "OPS-DOO"
         return None
 
 
@@ -479,13 +487,14 @@ def rename_and_type(df):
         code = str(row.get('code', '')).strip().upper()
         division = str(row.get('division', '')).upper()
         rank = str(row.get('rank', '')).upper()
+        name = str(row.get('name', '')).upper()
 
         if code == '+EMS':
-            # Prioritize identifying Paramedic vs FF
-            if 'MEDIC' in division:
-                return '+EMS (PM)' if 'PARAMEDIC' in rank else '+EMS (FF)'
-            elif 'AMBULANCE' in division:
-                return '+EMS (FF)'
+            if 'PM' in rank or '(PM)' in name:
+                return 'EMS WDO (PM)'
+            else:
+                return 'EMS WDO (FF)'
+
         return f"{row.get('ops_type')} WDO"
 
 
