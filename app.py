@@ -458,7 +458,8 @@ def rename_and_type(df):
 
 
 
-    df2['ops_type'] = df2['division'].apply(get_ops_type)
+    df2['ops_type'] = df2.apply(lambda row: get_ops_type(row.get('division'), row.get('code')), axis=1)
+
 
     def reclassify_ops_subtype(row):
         code = str(row.get('code', '')).strip().upper()
