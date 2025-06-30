@@ -349,17 +349,25 @@ def get_ops_type(division, code=None):
             return "LIMITED"
         if code == "+OT-COD":
             return "COD"
+    
+    non_ops_divisions = {clean_division_string(d) for d in non_ops_divisions}
+    fire_divisions = {clean_division_string(d) for d in fire_divisions}
+    ems_divisions = {clean_division_string(d) for d in ems_divisions}
+
 
     division_clean = clean_division_string(division)
-    if division_clean in {normalize_division_name(d) for d in non_ops_divisions}:
+
+    if division_clean in non_ops_divisions:
         return "NON-OPS"
-    elif division_clean in {normalize_division_name(d) for d in fire_divisions}:
+    elif division_clean in fire_divisions:
         return "FIRE"
-    elif division_clean in {normalize_division_name(d) for d in ems_divisions}:
+    elif division_clean in ems_divisions:
         return "EMS"
+
     for key, val in apparatus_class.items():
         if key in division_clean:
             return val
+
     return "UNKNOWN"
 
 
