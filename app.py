@@ -361,7 +361,17 @@ def get_ops_type(division, code=None):
 wdo_codes = {
     "DOW", "DET AS PEC", "TA-ANNEDU", "WDO", "+WDO",
     "+EMS (FF)", "+EMS (PM)", "+EMS", "EMS/DOTW", "EMS SUPER",
-    "OT-COD", "MANHOLD", "MANCALLCX"
+    "OT-COD","+OT-COD", "MANHOLD", "MANCALLCX",
+    "+OT-TA-ADM", "+OT-ISTO", "+OT-TA-INST", "+OT-RECERT", "+OT-SIMLAB", "+OT-TA-STUD",
+    "+OT-SPOPS", "+OT-SSO", "+OT-USAR", "+OT-MARINE", "+OT-ROCC",
+    "+OT-ARSON", "+OT-CANINE", "+OT-FIU",
+    "+OT-OMD", "+OT-HOH",
+    "+OTSE", "EPO", "+OT-FEDERAL",
+    "+OT-Fleet", "+OT-AD", "+OT-UL", "+OT-APP_COMM",
+    "+OT-LOGS", "+OT-PMD",
+    "+OT-PEER",
+    "+OT-FPD",
+    "+OT-ADMIN", "+OT-COURT", "+OT-CPAT", "+OT-GUARD", "+OT-TS", "+OT-IT", "+OT-H&S"
 }
 
 # OPS (Not Working)
