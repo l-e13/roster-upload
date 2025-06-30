@@ -359,8 +359,7 @@ def get_ops_type(division, code=None):
 
 
 wdo_codes = {
-    "DOW", "DET AS PEC", "TA-ANNEDU", "WDO", "+WDO",
-    "+EMS (FF)", "+EMS (PM)", "+EMS", "EMS/DOTW", "EMS SUPER",
+    "DOW", "DET AS PEC", "TA-ANNEDU", "WDO", "+WDO", "EMS/DOTW", "EMS SUPER",
     "OT-COD","+OT-COD", "MANHOLD", "MANCALLCX",
     "+OT-TA-ADM", "+OT-ISTO", "+OT-TA-INST", "+OT-RECERT", "+OT-SIMLAB", "+OT-TA-STUD",
     "+OT-SPOPS", "+OT-SSO", "+OT-USAR", "+OT-MARINE", "+OT-ROCC",
@@ -490,6 +489,8 @@ def rename_and_type(df):
         code = str(row.get('code', '')).strip().upper()
         division = normalize_division_name(row.get('division', ''))
         ops_type = row.get('ops_type', '').strip().upper()
+        rank = str(row.get('rank', '')).upper()
+        name = str(row.get('name', '')).upper()
 
         if code in limited_injury_codes:
             row['ops_type'] = "LIMITED"
@@ -497,6 +498,12 @@ def rename_and_type(df):
         if code in limited_issues_codes:
             row['ops_type'] = "LIMITED"
             return "issues"
+        
+        if code == '+EMS':
+            if 'PM' in rank or '(PM)' in name:
+                return "+EMS (PM)"
+            else:
+                return "+EMS (FF)"
 
         if ops_type in {"FIRE", "EMS"}:
             if code in ops_nw_codes:
