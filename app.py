@@ -342,6 +342,11 @@ def clean_division_string(text):
         return ""
     return re.sub(r'\s*\[.*?\]', '', text).strip().upper()
 
+
+non_ops_divisions = {clean_division_string(d) for d in non_ops_divisions}
+fire_divisions = {clean_division_string(d) for d in fire_divisions}
+ems_divisions = {clean_division_string(d) for d in ems_divisions}
+
 def get_ops_type(division, code=None):
     if code:
         code = str(code).strip().upper()
@@ -349,11 +354,6 @@ def get_ops_type(division, code=None):
             return "LIMITED"
         if code == "+OT-COD":
             return "COD"
-    
-    non_ops_divisions = {clean_division_string(d) for d in non_ops_divisions}
-    fire_divisions = {clean_division_string(d) for d in fire_divisions}
-    ems_divisions = {clean_division_string(d) for d in ems_divisions}
-
 
     division_clean = clean_division_string(division)
 
