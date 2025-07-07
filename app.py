@@ -502,9 +502,12 @@ def rename_and_type(df):
         code = str(row.get('code', '')).strip().upper()
         division = normalize_division_name(row.get('division', ''))
         ops_type = row.get('ops_type', '').strip().upper()
-        rank = str(row.get('rank', '')).upper()
+        rank = str(row.get('rank', '')).strip().upper()
         name = str(row.get('name', '')).upper()
 
+        if rank == "SUPERVISOR 2":
+            return "TA Student"
+        
         if code == "+OTC":
             return "OTC"
         
