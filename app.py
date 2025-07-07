@@ -505,6 +505,9 @@ def rename_and_type(df):
         rank = str(row.get('rank', '')).upper()
         name = str(row.get('name', '')).upper()
 
+        if code == "OTC":
+            return "OTC"
+        
         if code in limited_injury_codes:
             return "injury"
         if code in limited_issues_codes:
@@ -545,7 +548,7 @@ def rename_and_type(df):
             return "WDO SE"
 
         if code in wdo_other_ops_codes:
-            return "WDO Other Ops"
+            return "WDO Outside Ops"
 
         if ops_type == "EMS":
             if 'PM' in rank or 'PM' in name:
