@@ -498,6 +498,7 @@ def rename_and_type(df):
     df2['ops_type'] = df2.apply(lambda row: get_ops_type(row.get('division'), row.get('code')), axis=1)
 
 
+
     def reclassify_ops_subtype(row):
         code = str(row.get('code', '')).strip().upper()
         division = normalize_division_name(row.get('division', ''))
@@ -571,6 +572,8 @@ def rename_and_type(df):
 
 
     df2['wdo_category'] = df2.apply(assign_wdo_category, axis=1)
+    df2 = df2[df2['name'].notna()]
+    df2 = df2[~df2['name'].astype(str).str.strip().isin({'', '-', '?', 'nan'})]
     return df2.where(pd.notnull(df2), None)
 
 def push_to_bigquery(df, table_id):
