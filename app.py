@@ -572,8 +572,9 @@ def rename_and_type(df):
 
 
     df2['wdo_category'] = df2.apply(assign_wdo_category, axis=1)
+    bad_names = {'', '-', '?', '-,-', '?,?'}
     df2 = df2[df2['name'].notna()]
-    df2 = df2[~df2['name'].astype(str).str.strip().isin({'', '-', '?', 'nan'})]
+    df2 = df2[~df2['name'].astype(str).str.strip().str.upper().isin(bad_names)]
     return df2.where(pd.notnull(df2), None)
 
 def push_to_bigquery(df, table_id):
