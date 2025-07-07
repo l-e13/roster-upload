@@ -505,7 +505,7 @@ def rename_and_type(df):
         rank = str(row.get('rank', '')).strip().upper()
         name = str(row.get('name', '')).upper()
 
-        if rank == "SUPERVISOR 2":
+        if rank == "SUPERVISOR 2" or "Driver Operator Pumper" or "Driver Operator Aerial" or "GW Paramedic Program Students":
             return "TA Student"
         
         if code == "+OTC":
