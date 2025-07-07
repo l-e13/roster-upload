@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import re
-from datetime import datetime, timezone
+from datetime import datetime, time, timezone
 from pathlib import Path
 from google.cloud import bigquery
 from google.oauth2 import service_account
