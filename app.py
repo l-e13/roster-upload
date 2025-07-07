@@ -553,6 +553,12 @@ def rename_and_type(df):
                 return 'EMS WDO (PM)'
             else:
                 return 'EMS WDO (FF)'
+            
+        if ops_type == "FIRE":
+            if "PM" in rank or "PM" in name:
+                return "Fire WDO (PM)"
+            else:
+                return "Fire WDO"
 
         return f"{ops_type} WDO"
 
