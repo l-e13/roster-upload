@@ -22,7 +22,7 @@ page = st.sidebar.selectbox("Select a page", ["Roster Upload", "WDO Dashboard"])
 
 
 limited_injury_codes = {"LD", "LDPFC", "LD02X", "LDRTO"}
-limited_issues_codes = {"LDOIA", "LD/AFC-MES", "LD/AFCO", "LD/ATC-OPS", "LD/BULLETIN12"}
+limited_issues_codes = {"LDOIA", "LD/AFC-MES", "LD/AFCO", "LD/ATC-OPS", "LD/BULLETIN12", "LD/AFC-EMS"}
 limited_all = limited_injury_codes | limited_issues_codes
 
 
@@ -539,6 +539,9 @@ def rename_and_type(df):
         rank = str(row.get('rank', '')).upper()
         name = str(row.get('name', '')).upper()
         ops_type = str(row.get('ops_type', '')).upper()
+
+        if code == "+OTSE":
+            return "WDO SE"
 
         if code in wdo_other_ops_codes:
             return "WDO Other Ops"
