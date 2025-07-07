@@ -527,9 +527,7 @@ def rename_and_type(df):
                 return "OPS-DOO"
         return None
 
-
     df2['ops_subtype'] = df2.apply(reclassify_ops_subtype, axis=1)
-    # Now fix ops_type based on subtype
     df2.loc[df2['ops_subtype'].isin(["injury", "issues"]), 'ops_type'] = "LIMITED"
 
     def assign_wdo_category(row):
@@ -548,7 +546,7 @@ def rename_and_type(df):
         if code == "+OTSE":
             return "WDO SE"
 
-        if "FLEET" in division:
+        if clean_division_string(division) == "FLEET / FLEET OVERTIME":
             return "WDO Fleet"
 
         if code in wdo_other_ops_codes:
