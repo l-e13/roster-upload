@@ -383,7 +383,8 @@ wdo_codes = {
     "+OT-LOGS", "+OT-PMD",
     "+OT-PEER",
     "+OT-FPD",
-    "+OT-ADMIN", "+OT-COURT", "+OT-CPAT", "+OT-GUARD", "+OT-TS", "+OT-IT", "+OT-H&S"
+    "+OT-ADMIN", "+OT-COURT", "+OT-CPAT", "+OT-GUARD", "+OT-TS", "+OT-IT", "+OT-H&S",
+    "+COMP10", "+COMP15"
 }
 
 # OPS (Not Working)
@@ -393,7 +394,7 @@ ops_nw_codes = {
     '.ALP', '.AL', 'HOL/MIP', '.MIP', 'SL', '.POD', 'PFLU', 'AL/FMLA', 'COMPT', '.BEV',
     '.SL', 'PFLTT', 'FMSK', 'COMPS', '.COMPT', 'FMLW', 'FMCS', '.COMPS', 'ENLV-AL', 'ENLV-SL',
     'LDPFC', 'LD/AFC-MES', 'LD02X', 'LD/AFCO', 'LDRTO', 'LD/ATC-OPS', 'LD/BULLETIN12',
-    'AL LIEU SL', 'HOL/PFL', 'HOL/SLT', 'DOTW/SL', 'ALTU', 'ALTS', 'RLT'
+    'AL LIEU SL', 'HOL/PFL', 'HOL/SLT', 'DOTW/SL', 'ALTU', 'ALTS', 'RLT', "HOL/MIP"
 }
 ops_nw_codes = {c.strip().upper() for c in ops_nw_codes}
 
@@ -472,6 +473,9 @@ def rename_and_type(df):
         "column_9": "roster_date"
     }
     df2 = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
+
+    if 'code' in df2.columns:
+        df2['code'] = df2['code'].replace({'HOL/MIP': 'MIP'})
 
     if 'rank' in df2.columns:
         df2['rank'] = df2['rank'].astype(str).str.lstrip('.').str.strip()
