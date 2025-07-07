@@ -506,11 +506,10 @@ def rename_and_type(df):
         name = str(row.get('name', '')).upper()
 
         if code in limited_injury_codes:
-            row['ops_type'] = "LIMITED"
             return "injury"
         if code in limited_issues_codes:
-            row['ops_type'] = "LIMITED"
             return "issues"
+
         
         if code == '+EMS' and ops_type == "EMS":
             if 'PM' in rank or '(PM)' in name or 'PM' in name:
@@ -527,7 +526,9 @@ def rename_and_type(df):
 
 
     df2['ops_subtype'] = df2.apply(reclassify_ops_subtype, axis=1)
-
+    # Now fix ops_type based on subtype
+    df2.loc[df2['ops_subtype'] == "injury", 'ops_type'] = "LIMITED"
+    df2.loc[df2['ops_subtype'] == "issues", 'ops_type'] = "LIMITED"
 
 
     def assign_wdo_category(row):
