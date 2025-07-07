@@ -530,9 +530,7 @@ def rename_and_type(df):
 
     df2['ops_subtype'] = df2.apply(reclassify_ops_subtype, axis=1)
     # Now fix ops_type based on subtype
-    df2.loc[df2['ops_subtype'] == "injury", 'ops_type'] = "LIMITED"
-    df2.loc[df2['ops_subtype'] == "issues", 'ops_type'] = "LIMITED"
-
+    df2.loc[df2['ops_subtype'].isin(["injury", "issues"]), 'ops_type'] = "LIMITED"
 
     def assign_wdo_category(row):
         if not row.get('wdo_flag'):
