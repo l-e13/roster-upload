@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import re
-from datetime import datetime, date, time
+from datetime import datetime, timezone
 from pathlib import Path
 from google.cloud import bigquery
 from google.oauth2 import service_account
@@ -607,7 +607,7 @@ def log_upload_event(filename, row_count, status):
     log_table_id = st.secrets["bigquery"]["log_table_id"]
     rows_to_insert = [{
         "filename": filename,
-        "upload_time": datetime.utcnow().isoformat(),
+        "upload_time": datetime.now(timezone.utc).isoformat(),
         "row_count": row_count,
         "status": status
     }]
