@@ -542,8 +542,13 @@ def rename_and_type(df):
         name = str(row.get('name', '')).upper()
         ops_type = str(row.get('ops_type', '')).upper()
 
-        if code == "+OTSE":
-            return "WDO SE"
+        ta_codes = {"+OT-TA-INST", "+OT-TA-ADM", "+OT-ISTO", "+OT-TA-STUD", "+OT-SIMLAB"}
+        if code == "+OT-Fleet":
+            return "WDO Fleet"
+        elif code in ta_codes:
+            return "WDO TA"
+        elif code == "+OTSE":
+            return "WDO SE" 
 
         if code in wdo_other_ops_codes:
             return "WDO Outside Ops"
