@@ -480,9 +480,6 @@ def rename_and_type(df):
     if 'rank' in df2.columns:
         df2['rank'] = df2['rank'].astype(str).str.lstrip('.').str.strip()
 
-    if 'member_id' in df2.columns:
-        df2['member_id'] = df2['member_id'].astype(str).str.strip()
-
 
     def to_string_time(val):
         if isinstance(val, time):
@@ -595,12 +592,29 @@ def push_to_bigquery(df, table_id):
     csv_buffer = io.StringIO()
     df.to_csv(csv_buffer, index=False)
     csv_buffer.seek(0)
+
     job_config = bigquery.LoadJobConfig(
-        source_format=bigquery.SourceFormat.CSV,
-        skip_leading_rows=1,
-        autodetect=True,
-        write_disposition="WRITE_APPEND"
-    )
+    source_format=bigquery.SourceFormat.CSV,
+    skip_leading_rows=1,
+    autodetect=False,
+    write_disposition="WRITE_APPEND",
+    schema=[
+        bigquery.SchemaField("division", "STRING"),
+        bigquery.SchemaField("rank", "STRING"),
+        bigquery.SchemaField("member_id", "STRING"),
+        bigquery.SchemaField("name", "STRING"),
+        bigquery.SchemaField("code", "STRING"),
+        bigquery.SchemaField("start", "TIME"),
+        bigquery.SchemaField("through", "TIME"),
+        bigquery.SchemaField("hours", "FLOAT"),
+        bigquery.SchemaField("roster_date", "DATE"),
+        bigquery.SchemaField("wdo_flag", "BOOLEAN"),
+        bigquery.SchemaField("ops_type", "STRING"),
+        bigquery.SchemaField("ops_subtype", "STRING"),
+        bigquery.SchemaField("wdo_category", "STRING")
+    ]
+)
+
     job = client.load_table_from_file(
         file_obj=csv_buffer,
         destination=table_id,
