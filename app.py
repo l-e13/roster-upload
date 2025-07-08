@@ -480,6 +480,9 @@ def rename_and_type(df):
     if 'rank' in df2.columns:
         df2['rank'] = df2['rank'].astype(str).str.lstrip('.').str.strip()
 
+    if 'member_id' in df2.columns:
+        df2['member_id'] = df2['member_id'].astype(str).str.strip()
+
 
     def to_string_time(val):
         if isinstance(val, time):
