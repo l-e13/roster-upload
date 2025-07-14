@@ -302,7 +302,13 @@ ems_divisions = {
     "Ambulance 55",
     "Ambulance 56",
     "Quarters E14 / Ambulance 14",
-    "Quarters E30 / Medic 30"
+    "Quarters E30 / Medic 30",
+    "Quarters E06 / Ambulance 61",
+    "Quarters E27 / Ambulance 62",
+    "Quarters E19 / Ambulance 63",
+    "Quarters E22 / Ambulance 64",
+    "Quarters E31 / Ambulance 65",
+    "Quarters E01 / Ambulance 66"
 }
 
 apparatus_class = {
@@ -562,6 +568,9 @@ def rename_and_type(df):
 
         if clean_division_string(division) == "FLEET / FLEET OVERTIME":
             return "WDO Fleet"
+        
+        if code == "+OT-FEDERAL":
+            return "WDO FED"
 
         if code in wdo_other_ops_codes:
             return "WDO Outside Ops"
