@@ -22,7 +22,7 @@ page = st.sidebar.selectbox("Select a page", ["Roster Upload", "WDO Dashboard"])
 
 
 limited_injury_codes = {"LD", "LDPFC", "LD02X", "LDRTO", "LD/PFC"}
-limited_issues_codes = {"LDOIA", "LD/AFC-MES", "LD/AFCO", "LD/ATC-OPS", "LD/BULLETIN12", "LD/AFC-EMS", "LDAFC-OPS", "RFO", "RFO/OIA", "RFO-AFC-EMS"}
+limited_issues_codes = {"LDOIA", "LD/AFC-MES", "LD/AFCO", "LD/ATC-OPS", "LDPSPFC", "LD/BULLETIN12", "LD/AFC-EMS", "LDAFC-OPS", "RFO", "RFO/OIA", "RFO-AFC-EMS"}
 limited_all = limited_injury_codes | limited_issues_codes
 
 
