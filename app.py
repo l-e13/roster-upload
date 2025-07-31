@@ -18,7 +18,7 @@ if not pwd or pwd != st.secrets["app"]["app_password"]:
     st.stop()
 st.success("Access granted.")
 
-page = st.sidebar.selectbox("Select a page", ["Roster Upload", "WDO Dashboard"])
+st.title("Roster Upload")
 
 
 limited_injury_codes = {"LD", "LDPFC", "LD02X", "LDRTO", "LD/PFC"}
@@ -693,54 +693,4 @@ if page == "Roster Upload":
 
             st.write("Upload Summary")
             st.dataframe(pd.DataFrame(summary, columns=["filename", "status", "row_count"]))
-
-
-elif page == "WDO Dashboard":
-    st.header("WDO Dashboard Tester")
-
-    import plotly.express as px
-    import pandas as pd
-
-    # Query BigQuery
-    sql = """
-    SELECT 
-      roster_date,
-      ops_type,
-      COUNT(*) AS wdo_count
-    FROM `disco-ivy-463814-n0.rosters.roster_data`
-    WHERE wdo_flag = TRUE
-    GROUP BY roster_date, ops_type
-    """
-    client = get_bigquery_client()
-    df = client.query(sql).to_dataframe()
-
-    # Pivot to wide format
-    df_pivot = df.pivot(index="roster_date", columns="ops_type", values="wdo_count").fillna(0)
-    df_pivot["TOTAL"] = df_pivot.get("FIRE", 0) + df_pivot.get("EMS", 0)
-
-    def plot_interactive_series(data, label, color):
-        df_plot = pd.DataFrame({
-            "Date": pd.to_datetime(data.index).strftime('%Y-%m-%d'),
-            "WDO Count": data.values
-        })
-
-        mean = data.mean()
-        std = data.std()
-
-        fig = px.bar(df_plot, x="Date", y="WDO Count", title=f"{label} WDO per Day", color_discrete_sequence=[color])
-        fig.add_hline(y=mean, line_dash="dash", line_color="red", annotation_text=f"Mean = {mean:.2f}", annotation_position="top left")
-        fig.add_hline(y=mean + std, line_dash="dot", line_color="green", annotation_text=f"+1 SD = {mean + std:.2f}")
-        fig.add_hline(y=mean - std, line_dash="dot", line_color="green", annotation_text=f"-1 SD = {mean - std:.2f}")
-        fig.update_layout(xaxis_title="Date", yaxis_title="WDO Count")
-        st.plotly_chart(fig, use_container_width=True)
-
-    st.subheader("Fire WDO Per Day")
-    plot_interactive_series(df_pivot["FIRE"], "Fire", color="orange")
-
-    st.subheader("EMS WDO Per Day")
-    plot_interactive_series(df_pivot["EMS"], "EMS", color="blue")
-
-    st.subheader("Total WDO Per Day")
-    plot_interactive_series(df_pivot["TOTAL"], "Total", color="purple")
-
 
