@@ -645,52 +645,52 @@ def log_upload_event(filename, row_count, status):
     if errors:
         st.warning(f"\u26a0\ufe0f Failed to log upload for {filename}: {errors}")
 
-if page == "Roster Upload":
-    st.header("Upload Rosters")
 
-    upload_to_bigquery = st.checkbox("Upload to BigQuery", value=False)
-    uploaded_files = st.file_uploader("Choose Excel files", type=["xls", "xlsx"], accept_multiple_files=True)
-    table_id = st.secrets["bigquery"]["table_id"]
+st.header("Upload Rosters")
 
-    if uploaded_files:
-        if st.button("Process and upload all"):
-            summary = []
-            for uploaded_file in uploaded_files:
-                filename = Path(uploaded_file.name).name
-                st.write(f"---\n**Processing: {filename}**")
-                try:
-                    df_raw = pd.read_excel(uploaded_file, header=None)
-                    df_clean = clean_roster_generic(df_raw, filename)
-                    df_final = rename_and_type(df_clean)
+upload_to_bigquery = st.checkbox("Upload to BigQuery", value=False)
+uploaded_files = st.file_uploader("Choose Excel files", type=["xls", "xlsx"], accept_multiple_files=True)
+table_id = st.secrets["bigquery"]["table_id"]
 
-                    st.write("Cleaned Data Preview")
-                    st.dataframe(df_final.head(30))
+if uploaded_files:
+    if st.button("Process and upload all"):
+        summary = []
+        for uploaded_file in uploaded_files:
+            filename = Path(uploaded_file.name).name
+            st.write(f"---\n**Processing: {filename}**")
+            try:
+                df_raw = pd.read_excel(uploaded_file, header=None)
+                df_clean = clean_roster_generic(df_raw, filename)
+                df_final = rename_and_type(df_clean)
 
-                    csv_download = df_final.to_csv(index=False).encode('utf-8')
-                    st.download_button(
-                        label="Download CSV",
-                        data=csv_download,
-                        file_name=f"{filename.replace('.xlsx', '').replace('.xls', '')}_cleaned.csv",
-                        mime='text/csv'
-                )
+                st.write("Cleaned Data Preview")
+                st.dataframe(df_final.head(30))
+
+                csv_download = df_final.to_csv(index=False).encode('utf-8')
+                st.download_button(
+                    label="Download CSV",
+                    data=csv_download,
+                    file_name=f"{filename.replace('.xlsx', '').replace('.xls', '')}_cleaned.csv",
+                    mime='text/csv'
+            )
 
 
-                    if upload_to_bigquery:
-                        st.info("Uploading to BigQuery...")
-                        row_count = push_to_bigquery(df_final, table_id)
-                        st.success(f"\u2705 Uploaded {row_count} rows.")
-                        log_upload_event(filename, row_count, "success")
-                        summary.append((filename, "success", row_count))
-                    else:
-                        st.warning("\u23f8\ufe0f Skipped BigQuery upload (preview only).")
-                        log_upload_event(filename, len(df_final), "preview only")
-                        summary.append((filename, "preview only", len(df_final)))
+                if upload_to_bigquery:
+                    st.info("Uploading to BigQuery...")
+                    row_count = push_to_bigquery(df_final, table_id)
+                    st.success(f"\u2705 Uploaded {row_count} rows.")
+                    log_upload_event(filename, row_count, "success")
+                    summary.append((filename, "success", row_count))
+                else:
+                    st.warning("\u23f8\ufe0f Skipped BigQuery upload (preview only).")
+                    log_upload_event(filename, len(df_final), "preview only")
+                    summary.append((filename, "preview only", len(df_final)))
 
-                except Exception as e:
-                    st.error(f"\u274c Error processing '{filename}': {e}")
-                    log_upload_event(filename, 0, f"error: {str(e)}")
-                    summary.append((filename, "error", 0))
+            except Exception as e:
+                st.error(f"\u274c Error processing '{filename}': {e}")
+                log_upload_event(filename, 0, f"error: {str(e)}")
+                summary.append((filename, "error", 0))
 
-            st.write("Upload Summary")
-            st.dataframe(pd.DataFrame(summary, columns=["filename", "status", "row_count"]))
+        st.write("Upload Summary")
+        st.dataframe(pd.DataFrame(summary, columns=["filename", "status", "row_count"]))
 
